@@ -346,7 +346,6 @@
                         </configuration>
                     </plugin>
 
-
                     <!-- Generate report in xml format -->
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
