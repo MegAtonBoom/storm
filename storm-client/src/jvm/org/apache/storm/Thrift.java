@@ -64,6 +64,7 @@ public class Thrift {
         keys.toArray(STORM_TOPOLOGY_FIELDS = new StormTopology._Fields[keys.size()]);
     }
 
+
     public static StormTopology._Fields[] getTopologyFields() {
         return STORM_TOPOLOGY_FIELDS;
     }
