@@ -1,4 +1,4 @@
-name: CI/CD Control flow coverage (jacoco and Sonar) for Storm
+name: CI/CD Control flow coverage (jacoco) for Storm
 on:
   push:
     branches:
