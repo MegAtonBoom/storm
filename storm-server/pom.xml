@@ -248,7 +248,7 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <argLine>-javaagent:${project.basedir}/../ba-dua/ba-dua-agent-rt-0.6.0-all.jar -Doutput.file=target/badua.ser</argLine>
+                            <argLine>-javaagent:../ba-dua/ba-dua-agent-rt-0.6.0-all.jar -Doutput.file=target/badua.ser</argLine>
                         </configuration>
                     </plugin>
 
