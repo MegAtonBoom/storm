@@ -4,9 +4,9 @@
 name: CI/CD Data flow coverage (ba-dua) for Storm
 
 on:
-push:
-  branches:
-    - master
+  push:
+    branches:
+      - master
   pull_request:
     types: [opened, synchronize, reopened]
 
