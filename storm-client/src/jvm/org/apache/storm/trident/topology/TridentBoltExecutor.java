@@ -48,7 +48,7 @@ public class TridentBoltExecutor implements IRichBolt {
     Map<String, CoordCondition> coordConditions;
     ITridentBatchBolt bolt;
     long messageTimeoutMs;
-    long lastRotate;
+    long    lastRotate;
     RotatingMap<Object, TrackedBatch> batches;
     OutputCollector collector;
     CoordinatedOutputCollector coordCollector;

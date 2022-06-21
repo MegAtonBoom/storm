@@ -225,8 +225,8 @@
     <profiles>
         <profile>
 
-            <!-- profilo per eseguire l'analisi con ba-dua nel sottomodulo storm client -->
-            <id>ba-dua-coverage</id>
+            <!-- badua profile -->
+            <id>badua-coverage</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
             </activation>
@@ -248,9 +248,10 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <argLine>-javaagent:../ba-dua/ba-dua-agent-rt-0.6.0-all.jar -Doutput.file=target/badua.ser</argLine>
+                            <argLine>-javaagent:${project.basedir}/../ba-dua/ba-dua-agent-rt-0.6.0-all.jar -Doutput.file=target/badua.ser</argLine>
                         </configuration>
                     </plugin>
+
 
                     <!-- Generate report in xml format -->
                     <plugin>

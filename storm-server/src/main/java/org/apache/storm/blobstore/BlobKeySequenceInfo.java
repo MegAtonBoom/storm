@@ -12,7 +12,7 @@
 
 package org.apache.storm.blobstore;
 
-public class BlobKeySequenceInfo {
+public class  BlobKeySequenceInfo {
     private String nimbusHostPort;
     private String sequenceNumber;
 
