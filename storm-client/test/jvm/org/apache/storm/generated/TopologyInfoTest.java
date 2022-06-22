@@ -1,6 +1,7 @@
-package org.apache.storm.topology;
+package org.apache.storm.generated;
 
 import org.apache.storm.generated.ErrorInfo;
+import org.apache.storm.generated.ExecutorSummary;
 import org.apache.storm.generated.TopologyInfo;
 import org.junit.Assert;
 import org.junit.Test;
@@ -8,11 +9,12 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.Mock;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 
 @RunWith(Parameterized.class)
@@ -25,6 +27,7 @@ public class TopologyInfoTest {
     private TopologyInfo secundaryTI;
     private TopologyInfo toCopyTI;
     private boolean expectedCopyNPE;
+    private boolean expectedEqaulsNPE;
     private TopologyType toCopyType;
     private SecondTIType comparisonType;
 
@@ -38,22 +41,22 @@ public class TopologyInfoTest {
         ti.set_errors(null);
     }
 
-    public TopologyInfoTest(TopologyType toCopy, SecondTIType comparison, boolean expectedCopyNPE){
+    public TopologyInfoTest(TopologyType toCopy, SecondTIType comparison){
 
         this.primaryTI = new TopologyInfo();
         //configure the master topologyInfo class
         topologyConfig(this.primaryTI);
 
-        configureDeepCopyParam(toCopy, expectedCopyNPE);
+        configureDeepCopyParam(toCopy);
 
         configureEqualsParam(comparison);
 
     }
 
-    public void configureDeepCopyParam(TopologyType copy, boolean expectedCopyNPE){
+    public void configureDeepCopyParam(TopologyType copy){
 
         this.toCopyTI = new TopologyInfo();
-        this.expectedCopyNPE = expectedCopyNPE;
+        this.expectedCopyNPE = (copy == TopologyType.NULL);
         this.toCopyType = copy;
 
         switch(copy){
@@ -70,9 +73,9 @@ public class TopologyInfoTest {
         this.toCopyTI.set_id("copied_id");
         this.toCopyTI.set_name("copied_name");
         this.toCopyTI.set_uptime_secs(43);
-        this.toCopyTI.set_executors(null);
+        this.toCopyTI.set_executors(new ArrayList<>());
         this.toCopyTI.set_status("status_not_ok");
-        this.toCopyTI.set_errors(null);
+        this.toCopyTI.set_errors(new HashMap<>());
 
         this.toCopyTI.set_assigned_cpu(2);
 
@@ -81,14 +84,22 @@ public class TopologyInfoTest {
 
     private void getNotValidTI(){
         this.toCopyTI.set_id("copied_id");
-        this.toCopyTI.set_errors(getInvalidList());
-        this.toCopyTI.set_assigned_cpu(2);
+        this.toCopyTI.set_errors(getInvalidMap());
+        this.toCopyTI.set_executors(getInvalidList());
+
 
     }
 
-    private java.util.Map<java.lang.String, java.util.List<ErrorInfo>> getInvalidList(){
+    private java.util.Map<java.lang.String, java.util.List<ErrorInfo>> getInvalidMap(){
         java.util.Map<java.lang.String, java.util.List<ErrorInfo>> mockedMap = mock(java.util.HashMap.class);
-        doNothing().when(mockedMap).entrySet();
+        when(mockedMap.entrySet()).thenReturn(null);
+        when(mockedMap.size()).thenReturn(-5);
+        return mockedMap;
+    }
+
+    private java.util.List<ExecutorSummary> getInvalidList(){
+        java.util.List<ExecutorSummary> mockedMap = mock(java.util.ArrayList.class);
+        when(mockedMap.size()).thenReturn(-5);
         return mockedMap;
     }
 
@@ -96,6 +107,7 @@ public class TopologyInfoTest {
 
         this.secundaryTI = new TopologyInfo();
         this.comparisonType = comparison;
+        this.expectedEqaulsNPE = ( comparison == SecondTIType.NULL);
 
         switch(comparison){
 
@@ -136,15 +148,12 @@ public class TopologyInfoTest {
         }
         catch(NullPointerException npw){
 
-            this.primaryTI = new TopologyInfo();
-            topologyConfig(this.primaryTI);
             Assert.assertTrue(this.expectedCopyNPE);
 
         }
         catch(Exception e){
 
-            this.primaryTI = new TopologyInfo();
-            topologyConfig(this.primaryTI);
+
             Assert.assertEquals( this.toCopyType , TopologyType.NOT_VALID);
         }
         finally{
@@ -161,8 +170,6 @@ public class TopologyInfoTest {
         topologyConfig(this.primaryTI);
 
         try {
-            if(this.primaryTI==null) System.out.println("primary null");
-            if(this.secundaryTI==null) System.out.println("secundary null");
             boolean areEquals = this.primaryTI.equals(this.secundaryTI);
 
             if (areEquals) Assert.assertEquals(this.comparisonType, SecondTIType.SAME);
@@ -180,7 +187,9 @@ public class TopologyInfoTest {
     public static Collection parameters() {
         return Arrays.asList(new Object[][]{
                 //deepcopy param        confronto           copyNPE   confrontoNPE
-                {TopologyType.VALID,    SecondTIType.SAME,    false}
+                {TopologyType.VALID,    SecondTIType.SAME},
+                {TopologyType.NOT_VALID,    SecondTIType.DIFFERENT},
+                {TopologyType.NULL,    SecondTIType.NULL}
 
         });
     }

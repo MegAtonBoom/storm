@@ -15,11 +15,6 @@
             <version>${project.parent.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.storm</groupId>
-            <artifactId>storm-server</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
     </dependencies>
 
     <artifactId>test-jacoco</artifactId>

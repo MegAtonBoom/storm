@@ -1,6 +1,7 @@
 package org.apache.storm.dependency;
 
 import org.apache.storm.blobstore.ClientBlobStore;
+import org.apache.storm.blobstore.MockedClientBlobStore;
 import org.apache.storm.generated.*;
 import org.junit.Assert;
 import org.junit.Test;
@@ -9,12 +10,13 @@ import org.junit.runners.Parameterized;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 
 import static org.mockito.Mockito.*;
 
 @RunWith(Parameterized.class)
-public class DependencyUploaderTest {
+public class FirstImprovedDependencyUploaderTest {
 
     //class under test
     DependencyUploader du;
@@ -23,6 +25,7 @@ public class DependencyUploaderTest {
 
     //test class parameters
     private fileListType fileType;
+    private blobType blob;
     boolean expectedNPE;
     boolean expectedFileExc;
 
@@ -32,16 +35,16 @@ public class DependencyUploaderTest {
 
 
 
-    public DependencyUploaderTest(fileListType filteType, boolean cleanUpIfFails, boolean expectedNPE, boolean expectedFileExc) throws AuthorizationException, KeyNotFoundException, KeyAlreadyExistsException, IOException {
-        configure(filteType, cleanUpIfFails, expectedNPE, expectedFileExc);
+    public FirstImprovedDependencyUploaderTest(blobType blob, fileListType filteType, boolean cleanUpIfFails, boolean expectedNPE, boolean expectedFileExc) throws AuthorizationException, KeyNotFoundException, KeyAlreadyExistsException, IOException {
+        configure(blob, filteType, cleanUpIfFails, expectedNPE, expectedFileExc);
     }
 
-    public void configure(fileListType fileType, boolean cleanUpIfFails, boolean expectedNPE, boolean expectedFileExc) throws AuthorizationException, KeyNotFoundException, KeyAlreadyExistsException, IOException {
+    public void configure(blobType blob, fileListType fileType, boolean cleanUpIfFails, boolean expectedNPE, boolean expectedFileExc) throws AuthorizationException, KeyNotFoundException, KeyAlreadyExistsException, IOException {
 
+        this.blob=blob;
         this.fileType = fileType;
         this.du = new DependencyUploader();
         this.files = new ArrayList<>();
-        this.du.setBlobStore(getMockedCBS());
         this.cleanUpIfFails = cleanUpIfFails;
         this.expectedNPE = expectedNPE;
         this.expectedFileExc = expectedFileExc;
@@ -56,17 +59,25 @@ public class DependencyUploaderTest {
             default: this.files = null;
 
         }
+
+        this.du.setBlobStore(getMockedCBS(blob));
+
     }
 
 
     @Parameterized.Parameters
     public static Collection parameters() {
         return Arrays.asList(new Object[][]{
-                //deepcopy param        confronto           expectednpe
-                {fileListType.NULL,      true,              true,       false},
-                {fileListType.VALID,     false,             false,      false},
-                {fileListType.NOT_VALID,      true,              false,      true},
-                {fileListType.EMPTY,      false,              false,        false}
+                //blob                    file list type          cleanupIfFails    expectedNPE  expectedFileException           expectednpe
+                {blobType.VALID_WITH_KEY, fileListType.NULL,      true,              true,       false},
+                {blobType.VALID_WITH_KEY, fileListType.VALID,     false,             false,      false},
+                {blobType.VALID_WITH_KEY, fileListType.NOT_VALID,      true,              false,      true},
+                {blobType.VALID_WITH_KEY, fileListType.EMPTY,      false,              false,        false},
+
+                {blobType.VALID_WITHOUT_KEY, fileListType.VALID,      false,              false,        false},
+                {blobType.NULL, fileListType.NULL,      true,              true,        false},
+               {blobType.NOT_VALID, fileListType.VALID,      false,              true,        false}
+
 
         });
     }
@@ -83,10 +94,9 @@ public class DependencyUploaderTest {
             Assert.assertTrue( this.expectedNPE );
         }
         catch(RuntimeException e){
-            Assert.assertTrue( this.expectedFileExc );
+            Assert.assertTrue( this.expectedFileExc || (this.blob == blobType.VALID_WITHOUT_KEY));
         }
         catch(Exception e){
-            e.printStackTrace();
             Assert.fail();
         }
         finally{
@@ -96,12 +106,10 @@ public class DependencyUploaderTest {
     }
 
 
-    private ClientBlobStore getMockedCBS() throws AuthorizationException, KeyNotFoundException {
+    private ClientBlobStore getMockedCBS(blobType blob) throws AuthorizationException, KeyNotFoundException, KeyAlreadyExistsException {
 
-        ClientBlobStore cbs = mock(ClientBlobStore.class);
-        doNothing().when(cbs).deleteBlob(isA(String.class));
-        when(cbs.getBlobMeta(isA(String.class))).thenReturn(new ReadableBlobMeta());
-        return cbs;
+        MockedClientBlobStore cbs= new MockedClientBlobStore(blob);
+        return cbs.getCbs();
 
     }
 
@@ -110,11 +118,17 @@ public class DependencyUploaderTest {
 
         File mockFile = mock(File.class);
         when(mockFile.getName()).thenReturn("mockedvalid");
+        when(mockFile.toPath()).thenReturn(getMockedPath());
         when(mockFile.isFile()).thenReturn(true);
         when(mockFile.exists()).thenReturn(true);
 
         return mockFile;
 
+    }
+
+    private Path getMockedPath(){
+        Path mockedPath = mock(Path.class);
+        return mockedPath;
     }
 
     private File getMockedNotValidFile(){
@@ -125,6 +139,7 @@ public class DependencyUploaderTest {
 
         return mockFile;
     }
+
 
 
     private enum fileListType{
