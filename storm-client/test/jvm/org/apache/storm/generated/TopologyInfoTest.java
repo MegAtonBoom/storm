@@ -186,7 +186,7 @@ public class TopologyInfoTest {
             else Assert.assertNotEquals(this.comparisonType, SecondTIType.SAME);
         }
         catch(NullPointerException npe){
-            Assert.assertTrue( this.expectedCopyNPE );
+            Assert.assertTrue( this.expectedEqaulsNPE );
         }
         catch(Exception e ){
             //shouldn't fail
@@ -199,7 +199,7 @@ public class TopologyInfoTest {
     @Parameterized.Parameters
     public static Collection parameters() {
         return Arrays.asList(new Object[][]{
-                //deepcopy param        confronto           copyNPE   confrontoNPE
+                //deepcopy param        equals param
                 {TopologyType.VALID,    SecondTIType.SAME},
                 {TopologyType.NOT_VALID,    SecondTIType.DIFFERENT},
                 {TopologyType.NULL,    SecondTIType.NULL},

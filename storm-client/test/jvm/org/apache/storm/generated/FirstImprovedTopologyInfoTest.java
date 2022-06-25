@@ -231,7 +231,7 @@ public class FirstImprovedTopologyInfoTest {
     @Parameterized.Parameters
     public static Collection parameters() {
         return Arrays.asList(new Object[][]{
-                //deepcopy param        confronto           copyNPE   confrontoNPE
+                //deepcopy param              equals param
                 {TopologyType.VALID_EMPTY,    SecondTIType.SAME},
                 {TopologyType.VALID_FULL,    SecondTIType.NOT_VALID},
                 {TopologyType.NOT_VALID,    SecondTIType.DIFFERENT},

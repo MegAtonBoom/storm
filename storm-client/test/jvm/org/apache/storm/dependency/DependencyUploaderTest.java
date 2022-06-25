@@ -62,11 +62,11 @@ public class DependencyUploaderTest {
     @Parameterized.Parameters
     public static Collection parameters() {
         return Arrays.asList(new Object[][]{
-                //deepcopy param        confronto           expectednpe
-                {fileListType.NULL,      true,              true,       false},
-                {fileListType.VALID,     false,             false,      false},
-                {fileListType.NOT_VALID,      true,              false,      true},
-                {fileListType.EMPTY,      false,              false,        false}
+                //fileList type          cleanupIfFails     expected NullPonterExc    Expected other exception
+                {fileListType.NULL,      true,              true,                     false},
+                {fileListType.VALID,     false,             false,                    false},
+                {fileListType.NOT_VALID,      true,         false,                    true},
+                {fileListType.EMPTY,      false,            false,                    false}
 
         });
     }
