@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.Mock;
+import org.mockito.internal.matchers.Null;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,7 +63,7 @@ public class TopologyInfoTest {
         switch(copy){
             case VALID: getValidTI(); break;
 
-            case NOT_VALID: getNotValidTI(); break;
+            case NOT_VALID: getNotValidTI(false); break;
 
             default: this.toCopyTI = null; break;
         }
@@ -82,10 +83,17 @@ public class TopologyInfoTest {
 
     }
 
-    private void getNotValidTI(){
-        this.toCopyTI.set_id("copied_id");
-        this.toCopyTI.set_errors(getInvalidMap());
-        this.toCopyTI.set_executors(getInvalidList());
+    private void getNotValidTI(boolean equals){
+        if(!equals) {
+            this.toCopyTI.set_id("copied_id");
+            this.toCopyTI.set_errors(getInvalidMap());
+            this.toCopyTI.set_executors(getInvalidList());
+        }
+        else{
+            this.secundaryTI.set_id("copied_id");
+            this.secundaryTI.set_errors(getInvalidMap());
+            this.secundaryTI.set_executors(getInvalidList());
+        }
 
 
     }
@@ -114,6 +122,8 @@ public class TopologyInfoTest {
             case SAME: topologyConfig(this.secundaryTI); break;
 
             case DIFFERENT: getDifferentTI(); break;
+
+            case NOT_VALID: getNotValidTI(true);
 
             default: this.secundaryTI = null;
         }
@@ -153,7 +163,6 @@ public class TopologyInfoTest {
         }
         catch(Exception e){
 
-
             Assert.assertEquals( this.toCopyType , TopologyType.NOT_VALID);
         }
         finally{
@@ -176,8 +185,12 @@ public class TopologyInfoTest {
 
             else Assert.assertNotEquals(this.comparisonType, SecondTIType.SAME);
         }
+        catch(NullPointerException npe){
+            Assert.assertTrue( this.expectedCopyNPE );
+        }
         catch(Exception e ){
-            e.printStackTrace();
+            //shouldn't fail
+            Assert.fail();
         }
 
     }
@@ -189,7 +202,8 @@ public class TopologyInfoTest {
                 //deepcopy param        confronto           copyNPE   confrontoNPE
                 {TopologyType.VALID,    SecondTIType.SAME},
                 {TopologyType.NOT_VALID,    SecondTIType.DIFFERENT},
-                {TopologyType.NULL,    SecondTIType.NULL}
+                {TopologyType.NULL,    SecondTIType.NULL},
+                {TopologyType.NULL,    SecondTIType.NOT_VALID}
 
         });
     }
@@ -206,6 +220,7 @@ public class TopologyInfoTest {
 
         SAME,
         DIFFERENT,
+        NOT_VALID,
         NULL
     }
 

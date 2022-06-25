@@ -383,5 +383,50 @@
             </build>
         </profile>
 
+        <!-- added pit profile-->
+        <profile>
+            <id>pit-testing</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <withHistory>true</withHistory>
+                <pitest.version>1.8.0</pitest.version>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.pitest</groupId>
+                        <artifactId>pitest-maven</artifactId>
+                        <version>${pitest.version}</version>
+                        <configuration>
+                            <targetClasses>
+                                <param>org.apache.storm.generated.TopologyInfo</param>
+                                <param>org.apache.storm.dependency.DependencyUploader</param>
+                            </targetClasses>
+                            <targetTests>
+                                <param>org.apache.storm.dependency.DependencyUploaderTest</param>
+                                <param>org.apache.storm.dependency.FirstImprovedDependencyUploaderTest</param>
+                                <param>org.apache.storm.generated.TopologyInfoTest</param>
+                                <param>org.apache.storm.generated.FirstImprovedTopologyInfoTest</param>
+                            </targetTests>
+                            <avoidCallsTo>
+                                <avoidCallsTo>org.slf4j</avoidCallsTo>
+                            </avoidCallsTo>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>Generate PIT report</id>
+                                <phase>test-compile</phase>
+                                <goals>
+                                    <goal>mutationCoverage</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
     </profiles>
 </project>

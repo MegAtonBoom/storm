@@ -16,6 +16,10 @@ import static org.mockito.Mockito.*;
 @RunWith(Parameterized.class)
 public class FirstImprovedTopologyInfoTest {
 
+
+
+
+
     //TestedClass
     private TopologyInfo primaryTI;
 
@@ -23,7 +27,7 @@ public class FirstImprovedTopologyInfoTest {
     private TopologyInfo secundaryTI;
     private TopologyInfo toCopyTI;
     private boolean expectedCopyNPE;
-    private boolean expectedEqaulsNPE;
+    private boolean expectedEqualsNPE;
     private TopologyType toCopyType;
     private SecondTIType comparisonType;
 
@@ -65,9 +69,15 @@ public class FirstImprovedTopologyInfoTest {
         this.toCopyType = copy;
 
         switch(copy){
-            case VALID: getValidTI(); break;
 
-            case NOT_VALID: getNotValidTI(); break;
+            //case VALID: getValidTI();
+
+            //next 2 added to improve badua coverage
+            case VALID_EMPTY: getValidTI(); break;
+
+            case VALID_FULL: getFullValidTI(); break;
+
+            case NOT_VALID: getNotValidTI(false); break;
 
             default: this.toCopyTI = null; break;
         }
@@ -77,7 +87,7 @@ public class FirstImprovedTopologyInfoTest {
 
         this.secundaryTI = new TopologyInfo();
         this.comparisonType = comparison;
-        this.expectedEqaulsNPE = ( comparison == SecondTIType.NULL);
+        this.expectedEqualsNPE = ( comparison == SecondTIType.NULL);
 
         switch(comparison){
 
@@ -85,8 +95,27 @@ public class FirstImprovedTopologyInfoTest {
 
             case DIFFERENT: getDifferentTI(); break;
 
+            case NOT_VALID: getNotValidTI(true);
+
             default: this.secundaryTI = null;
         }
+    }
+
+    //added to improve badua coverage
+    private void getFullValidTI(){
+        getValidTI();
+        this.toCopyTI.set_component_debug(new HashMap<>());
+        this.toCopyTI.set_storm_version("versione_10");
+        this.toCopyTI.set_sched_status("statusss");
+        this.toCopyTI.set_owner("test_owner");
+        this.toCopyTI.set_replication_count(10);
+        this.toCopyTI.set_requested_cpu(2);
+        this.toCopyTI.set_requested_memoffheap(3);
+        this.toCopyTI.set_requested_memonheap(3);
+        this.toCopyTI.set_assigned_cpu(2);
+        this.toCopyTI.set_assigned_memoffheap(3);
+        this.toCopyTI.set_assigned_memonheap(3);
+
     }
 
     private void getValidTI(){
@@ -103,10 +132,17 @@ public class FirstImprovedTopologyInfoTest {
 
     }
 
-    private void getNotValidTI(){
-        this.toCopyTI.set_id("copied_id");
-        this.toCopyTI.set_errors(getInvalidMap());
-        this.toCopyTI.set_executors(getInvalidList());
+    private void getNotValidTI(boolean equals){
+        if(!equals) {
+            this.toCopyTI.set_id("copied_id");
+            this.toCopyTI.set_errors(getInvalidMap());
+            this.toCopyTI.set_executors(getInvalidList());
+        }
+        else{
+            this.secundaryTI.set_id("copied_id");
+            this.secundaryTI.set_errors(getInvalidMap());
+            this.secundaryTI.set_executors(getInvalidList());
+        }
 
 
     }
@@ -182,6 +218,9 @@ public class FirstImprovedTopologyInfoTest {
 
             else Assert.assertNotEquals(this.comparisonType, SecondTIType.SAME);
         }
+        catch(NullPointerException npe){
+            Assert.assertTrue( this.expectedEqualsNPE );
+        }
         catch(Exception e ){
             e.printStackTrace();
         }
@@ -193,7 +232,8 @@ public class FirstImprovedTopologyInfoTest {
     public static Collection parameters() {
         return Arrays.asList(new Object[][]{
                 //deepcopy param        confronto           copyNPE   confrontoNPE
-                {TopologyType.VALID,    SecondTIType.SAME},
+                {TopologyType.VALID_EMPTY,    SecondTIType.SAME},
+                {TopologyType.VALID_FULL,    SecondTIType.NOT_VALID},
                 {TopologyType.NOT_VALID,    SecondTIType.DIFFERENT},
                 {TopologyType.NULL,    SecondTIType.NULL}
 
@@ -203,7 +243,12 @@ public class FirstImprovedTopologyInfoTest {
 
 
     private enum TopologyType{
-        VALID,
+        //old
+        //VALID
+
+        //next 2 added to improve badua coverage
+        VALID_EMPTY,
+        VALID_FULL,
         NOT_VALID,
         NULL,
     }
@@ -212,6 +257,7 @@ public class FirstImprovedTopologyInfoTest {
 
         SAME,
         DIFFERENT,
+        NOT_VALID,
         NULL
     }
 

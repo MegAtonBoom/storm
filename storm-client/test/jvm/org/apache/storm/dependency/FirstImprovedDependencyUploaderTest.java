@@ -7,6 +7,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.mockito.Mockito;
+import org.mockito.Spy;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +21,7 @@ import static org.mockito.Mockito.*;
 public class FirstImprovedDependencyUploaderTest {
 
     //class under test
+    @Spy
     DependencyUploader du;
 
     //Mockito.verify(fooMocked, times(0)).setSomething(anyInt());
@@ -44,6 +47,10 @@ public class FirstImprovedDependencyUploaderTest {
         this.blob=blob;
         this.fileType = fileType;
         this.du = new DependencyUploader();
+
+        //added to improve pit coverage
+        this.du= Mockito.spy(this.du);
+
         this.files = new ArrayList<>();
         this.cleanUpIfFails = cleanUpIfFails;
         this.expectedNPE = expectedNPE;
@@ -74,11 +81,18 @@ public class FirstImprovedDependencyUploaderTest {
                 {blobType.VALID_WITH_KEY, fileListType.NOT_VALID,      true,              false,      true},
                 {blobType.VALID_WITH_KEY, fileListType.EMPTY,      false,              false,        false},
 
+                //added to improve jacoco coverage
+                //
                 {blobType.VALID_WITHOUT_KEY, fileListType.VALID,      false,              false,        false},
                 {blobType.NULL, fileListType.NULL,      true,              true,        false},
-               {blobType.NOT_VALID, fileListType.VALID,      false,              true,        false}
+                //{blobType.NOT_VALID, fileListType.VALID,      false,              true,        false},
 
-
+                //added to improve pit mutation coverage
+                {blobType.VALID_WITH_KEY, fileListType.VALID,      true,              false,        false},
+                {blobType.VALID_WITH_KEY, fileListType.EMPTY,      true,              false,        false},
+                //{blobType.NOT_VALID, fileListType.VALID,      true,              true,        false},
+                {blobType.VALID_WITHOUT_KEY, fileListType.EMPTY,      false,              false,        false},
+                {blobType.VALID_WITHOUT_KEY, fileListType.VALID,      true,              false,        false}
         });
     }
 
@@ -89,6 +103,7 @@ public class FirstImprovedDependencyUploaderTest {
         try{
             output=this.du.uploadFiles( this.files, this.cleanUpIfFails);
             Assert.assertEquals(output.size(), this.files.size());
+
         }
         catch(NullPointerException npe){
             Assert.assertTrue( this.expectedNPE );
@@ -100,7 +115,13 @@ public class FirstImprovedDependencyUploaderTest {
             Assert.fail();
         }
         finally{
+
             this.du.shutdown();
+            //added to improve pit coverage
+            if(!this.cleanUpIfFails){
+                verify(this.du, times(0)).deleteBlobs(isA(List.class));
+            }
+
         }
 
     }
