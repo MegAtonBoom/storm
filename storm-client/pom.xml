@@ -258,7 +258,7 @@
         </plugins>
     </build>
     <profiles>
-        <profile>
+        <!--<profile>
             <id>unix_py_tests</id>
             <activation>
                 <os>
@@ -271,7 +271,7 @@
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
                         <executions>
-                            <!--<execution>
+                            <execution>
                                 <configuration>
                                     <executable>python3</executable>
                                     <workingDirectory>test/py</workingDirectory>
@@ -289,7 +289,7 @@
                                 <goals>
                                     <goal>exec</goal>
                                 </goals>
-                            </execution>-->
+                            </execution>
                         </executions>
                     </plugin>
                     <plugin>
@@ -316,7 +316,7 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
+        </profile>-->
         <profile>
 
             <!-- profilo per eseguire l'analisi con ba-dua nel sottomodulo storm client -->
