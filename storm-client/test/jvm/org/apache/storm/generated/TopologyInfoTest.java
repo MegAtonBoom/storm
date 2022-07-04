@@ -33,20 +33,37 @@ public class TopologyInfoTest {
     private SecondTIType comparisonType;
 
 
-    private void topologyConfig(TopologyInfo ti){
-        ti.set_id("first_id");
-        ti.set_name("first_name");
-        ti.set_uptime_secs(42);
-        ti.set_executors(null);
-        ti.set_status("status_ok");
-        ti.set_errors(null);
+    private void topologyConfig(int i){
+        if(i==1) firstTopologyConfig();
+        else if(i==2) secondTopologyConfig();
     }
 
+    private void firstTopologyConfig(){
+
+        this.primaryTI = new TopologyInfo();
+        this.primaryTI.set_id("first_id");
+        this.primaryTI.set_name("first_name");
+        this.primaryTI.set_uptime_secs(42);
+        this.primaryTI.set_executors(null);
+        this.primaryTI.set_status("status_ok");
+        this.primaryTI.set_errors(null);
+    }
+
+    private void secondTopologyConfig(){
+
+        this.secundaryTI = new TopologyInfo();
+        this.secundaryTI.setFieldValue(TopologyInfo._Fields.ID, "first_id");
+        this.secundaryTI.setFieldValue(TopologyInfo._Fields.NAME, "first_name");
+        this.secundaryTI.setFieldValue(TopologyInfo._Fields.UPTIME_SECS, 42);
+        this.secundaryTI.setFieldValue(TopologyInfo._Fields.EXECUTORS, null);
+        this.secundaryTI.setFieldValue(TopologyInfo._Fields.STATUS, "status_ok");
+        this.secundaryTI.setFieldValue(TopologyInfo._Fields.ERRORS, null);
+    }
     public TopologyInfoTest(TopologyType toCopy, SecondTIType comparison){
 
         this.primaryTI = new TopologyInfo();
         //configure the master topologyInfo class
-        topologyConfig(this.primaryTI);
+        topologyConfig(1);
 
         configureDeepCopyParam(toCopy);
 
@@ -119,7 +136,7 @@ public class TopologyInfoTest {
 
         switch(comparison){
 
-            case SAME: topologyConfig(this.secundaryTI); break;
+            case SAME: topologyConfig(2); break;
 
             case DIFFERENT: getDifferentTI(); break;
 
@@ -167,7 +184,7 @@ public class TopologyInfoTest {
         }
         finally{
             this.primaryTI = new TopologyInfo();
-            topologyConfig(this.primaryTI);
+            topologyConfig(1);
         }
     }
 
@@ -176,7 +193,7 @@ public class TopologyInfoTest {
 
         this.primaryTI = new TopologyInfo();
         //configure the master topologyInfo class
-        topologyConfig(this.primaryTI);
+        topologyConfig(1);
 
         try {
             boolean areEquals = this.primaryTI.equals(this.secundaryTI);

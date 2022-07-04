@@ -31,30 +31,37 @@ public class FirstImprovedTopologyInfoTest {
     private TopologyType toCopyType;
     private SecondTIType comparisonType;
 
-
-    private void firstTopologyConfig(TopologyInfo ti){
-        ti.set_id("first_id");
-        ti.set_name("first_name");
-        ti.set_uptime_secs(42);
-        ti.set_executors(null);
-        ti.set_status("status_ok");
-        ti.set_errors(null);
+    private void topologyConfig(int i){
+        if(i==1) firstTopologyConfig();
+        else if(i==2) secondTopologyConfig();
     }
 
-    private void secondTopologyConfig(TopologyInfo ti){
-        ti.setFieldValue(TopologyInfo._Fields.ID, "first_id");
-        ti.setFieldValue(TopologyInfo._Fields.NAME, "first_name");
-        ti.setFieldValue(TopologyInfo._Fields.UPTIME_SECS, 42);
-        ti.setFieldValue(TopologyInfo._Fields.EXECUTORS, null);
-        ti.setFieldValue(TopologyInfo._Fields.STATUS, "status_ok");
-        ti.setFieldValue(TopologyInfo._Fields.ERRORS, null);
+    private void firstTopologyConfig(){
+
+        this.primaryTI = new TopologyInfo();
+        this.primaryTI.set_id("first_id");
+        this.primaryTI.set_name("first_name");
+        this.primaryTI.set_uptime_secs(42);
+        this.primaryTI.set_executors(null);
+        this.primaryTI.set_status("status_ok");
+        this.primaryTI.set_errors(null);
+    }
+
+    private void secondTopologyConfig(){
+
+        this.secundaryTI = new TopologyInfo();
+        this.secundaryTI.setFieldValue(TopologyInfo._Fields.ID, "first_id");
+        this.secundaryTI.setFieldValue(TopologyInfo._Fields.NAME, "first_name");
+        this.secundaryTI.setFieldValue(TopologyInfo._Fields.UPTIME_SECS, 42);
+        this.secundaryTI.setFieldValue(TopologyInfo._Fields.EXECUTORS, null);
+        this.secundaryTI.setFieldValue(TopologyInfo._Fields.STATUS, "status_ok");
+        this.secundaryTI.setFieldValue(TopologyInfo._Fields.ERRORS, null);
     }
 
     public FirstImprovedTopologyInfoTest(TopologyType toCopy, SecondTIType comparison){
 
-        this.primaryTI = new TopologyInfo();
         //configure the master topologyInfo class
-        firstTopologyConfig(this.primaryTI);
+        firstTopologyConfig();
 
         configureDeepCopyParam(toCopy);
 
@@ -91,7 +98,7 @@ public class FirstImprovedTopologyInfoTest {
 
         switch(comparison){
 
-            case SAME: secondTopologyConfig(this.secundaryTI); break;
+            case SAME: topologyConfig(2); break;
 
             case DIFFERENT: getDifferentTI(); break;
 
@@ -180,7 +187,7 @@ public class FirstImprovedTopologyInfoTest {
 
 
         try{
-            this.primaryTI = new TopologyInfo(this.toCopyTI);;
+            this.primaryTI = new TopologyInfo(this.toCopyTI);
             Assert.assertEquals(this.primaryTI.get_id(), this.toCopyTI.get_id());
             Assert.assertEquals(this.primaryTI.get_name(), this.toCopyTI.get_name());
             Assert.assertEquals(this.primaryTI.get_uptime_secs(), this.toCopyTI.get_uptime_secs());
@@ -199,17 +206,15 @@ public class FirstImprovedTopologyInfoTest {
             Assert.assertEquals( this.toCopyType , TopologyType.NOT_VALID);
         }
         finally{
-            this.primaryTI = new TopologyInfo();
-            firstTopologyConfig(this.primaryTI);
+            topologyConfig(1);
         }
     }
 
     @Test
     public void testEquals(){
 
-        this.primaryTI = new TopologyInfo();
         //configure the master topologyInfo class
-        firstTopologyConfig(this.primaryTI);
+        topologyConfig(1);
 
         try {
             boolean areEquals = this.primaryTI.equals(this.secundaryTI);
